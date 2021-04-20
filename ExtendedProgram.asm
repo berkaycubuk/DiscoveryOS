@@ -1,10 +1,8 @@
 [org 0x7e00]
-
 jmp EnterProtectedMode
 
 %include "gdt.asm"
 %include "print.asm"
-%include "CPUID.asm"
 
 EnterProtectedMode:
     call EnableA20
@@ -23,6 +21,9 @@ EnableA20:
 
 [bits 32]
 
+%include "CPUID.asm"
+%include "SimplePaging.asm"
+
 StartProtectedMode:
     mov ax, dataseg
     mov ds, ax
@@ -35,6 +36,19 @@ StartProtectedMode:
 
     call DetectCPUID
     call DetectLongMode
+    call SetUpIdentityPaging
+    call EditGDT
+    jmp codeseg:Start64Bit
+
+[bits 64]
+; [extern _start]
+
+Start64Bit:
+    mov edi, 0xb8000
+    mov rax, 0x1F201F201F201F20
+    mov ecx, 500
+    rep stosq
+    ; call _start
     jmp $
 
 times 2048-($-$$) db 0
