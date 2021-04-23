@@ -1,8 +1,13 @@
+void printf(char* str)
+{
+    static unsigned short* VideoMemory = (unsigned short*)0xb8000;
+
+    for (int i=0; str[i]!='\0'; i++)
+        VideoMemory[i] = (VideoMemory[i] & 0xFF00)|str[i];
+}
+
 extern "C" void kernel()
 {
-    const short color = 0x0F00;
-    const char* hello = "Hello cpp!";
-    short* vga = (short*)0xb8000;
-    for (int i = 0; i < 16; i++ )
-        vga[i+18] = color | hello[i];
+    char* text = (char*)"Hello DiscoveryOS!";
+    printf(text);
 }
